@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  INSTRUCTOR
+  STUDENT
+}
+
+enum LessonStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum VehicleStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum OwnerType {
+  INSTRUCTOR
+  STUDENT
+}
+
+model User {
+  id         String     @id @default(uuid())
+  name       String
+  email      String     @unique
+  password   String
+  role       Role
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+  instructor Instructor?
+  student    Student?
+
+  @@map("users")
+}
+
+model Instructor {
+  id            String   @id @default(uuid())
+  userId        String   @unique @map("user_id")
+  licenseNumber String   @unique @map("license_number")
+  category      String
+  licenseStatus String   @default("ACTIVE") @map("license_status")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessons  Lesson[]
+
+  @@map("instructors")
+}
+
+model Student {
+  id              String   @id @default(uuid())
+  userId          String   @unique @map("user_id")
+  cpf             String   @unique
+  desiredCategory String   @map("desired_category")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessons  Lesson[]
+
+  @@map("students")
+}
+
+model Vehicle {
+  id           String        @id @default(uuid())
+  plate        String        @unique
+  category     String
+  ownerType    OwnerType     @map("owner_type")
+  ownerId      String        @map("owner_id")
+  hasDualControl Boolean     @default(false) @map("has_dual_control")
+  isRegular    Boolean       @default(false) @map("is_regular")
+  status       VehicleStatus @default(PENDING)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  lessons Lesson[]
+
+  @@map("vehicles")
+}
+
+model Lesson {
+  id              String       @id @default(uuid())
+  instructorId    String       @map("instructor_id")
+  studentId       String       @map("student_id")
+  vehicleId       String       @map("vehicle_id")
+  date            String
+  startTime       String       @map("start_time")
+  endTime         String?      @map("end_time")
+  durationMinutes Int          @map("duration_minutes")
+  rating          Float?
+  notes           String?
+  difficulties    String?
+  status          LessonStatus @default(SCHEDULED)
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  instructor Instructor @relation(fields: [instructorId], references: [id])
+  student    Student    @relation(fields: [studentId], references: [id])
+  vehicle    Vehicle    @relation(fields: [vehicleId], references: [id])
+
+  @@map("lessons")
+}
