@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { z } from 'zod'
 import * as studentService from './student.service'
+import * as studentStatsService from './student.stats.service'
 
 const createSchema = z.object({
   name: z.string().min(1),
@@ -50,6 +51,15 @@ export async function update(req: Request, res: Response, next: NextFunction): P
     const data = updateSchema.parse(req.body)
     const student = await studentService.updateStudent(req.params.id, data)
     res.json(student)
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function getStats(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const stats = await studentStatsService.getStudentStats(req.params.id)
+    res.json(stats)
   } catch (err) {
     next(err)
   }
