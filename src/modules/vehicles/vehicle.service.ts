@@ -60,3 +60,18 @@ export async function getVehicleById(id: string) {
   if (!vehicle) throw new AppError('Vehicle not found', 404)
   return formatVehicle(vehicle)
 }
+
+export async function updateVehicleStatus(id: string, status: 'APPROVED' | 'REJECTED') {
+  const vehicle = await prisma.vehicle.findUnique({ where: { id } })
+  if (!vehicle) throw new AppError('Vehicle not found', 404)
+
+  const updated = await prisma.vehicle.update({
+    where: { id },
+    data: {
+      status,
+      isRegular: status === 'APPROVED',
+    },
+  })
+
+  return formatVehicle(updated)
+}

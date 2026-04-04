@@ -44,3 +44,17 @@ export async function getById(req: Request, res: Response, next: NextFunction): 
     next(err)
   }
 }
+
+const updateStatusSchema = z.object({
+  status: z.enum(['APPROVED', 'REJECTED']),
+})
+
+export async function updateStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { status } = updateStatusSchema.parse(req.body)
+    const vehicle = await vehicleService.updateVehicleStatus(req.params.id, status)
+    res.json(vehicle)
+  } catch (err) {
+    next(err)
+  }
+}
