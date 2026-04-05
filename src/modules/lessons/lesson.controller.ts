@@ -52,7 +52,7 @@ export async function list(req: Request, res: Response, next: NextFunction): Pro
   }
 }
 
-export async function complete(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function complete(req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> {
   try {
     const data = completeSchema.parse(req.body)
     const lesson = await lessonService.completeLesson(req.params.id, data)
@@ -62,7 +62,7 @@ export async function complete(req: Request, res: Response, next: NextFunction):
   }
 }
 
-export async function cancel(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function cancel(req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> {
   try {
     const lesson = await lessonService.cancelLesson(req.params.id)
     res.json(lesson)

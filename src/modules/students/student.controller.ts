@@ -37,7 +37,7 @@ export async function getMe(req: Request, res: Response, next: NextFunction): Pr
   }
 }
 
-export async function getById(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getById(req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> {
   try {
     const student = await studentService.getStudentById(req.params.id)
     res.json(student)
@@ -46,7 +46,7 @@ export async function getById(req: Request, res: Response, next: NextFunction): 
   }
 }
 
-export async function update(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function update(req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> {
   try {
     const data = updateSchema.parse(req.body)
     const student = await studentService.updateStudent(req.params.id, data)
@@ -56,7 +56,7 @@ export async function update(req: Request, res: Response, next: NextFunction): P
   }
 }
 
-export async function getStats(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getStats(req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> {
   try {
     const stats = await studentStatsService.getStudentStats(req.params.id)
     res.json(stats)

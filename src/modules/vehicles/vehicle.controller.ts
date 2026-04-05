@@ -36,7 +36,7 @@ export async function list(req: Request, res: Response, next: NextFunction): Pro
   }
 }
 
-export async function getById(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function getById(req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> {
   try {
     const vehicle = await vehicleService.getVehicleById(req.params.id)
     res.json(vehicle)
@@ -49,7 +49,7 @@ const updateStatusSchema = z.object({
   status: z.enum(['APPROVED', 'REJECTED']),
 })
 
-export async function updateStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function updateStatus(req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> {
   try {
     const { status } = updateStatusSchema.parse(req.body)
     const vehicle = await vehicleService.updateVehicleStatus(req.params.id, status)
