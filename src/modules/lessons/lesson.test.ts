@@ -12,8 +12,8 @@ let lessonId: string
 
 beforeAll(async () => {
   // Cleanup
-  await prisma.lesson.deleteMany({ where: { notes: 'test-lesson' } })
-  await prisma.vehicle.deleteMany({ where: { plate: 'TEST0001' } })
+  await prisma.lesson.deleteMany({ where: { vehicle: { plate: { in: ['TEST0001', 'TESTPEND1'] } } } })
+  await prisma.vehicle.deleteMany({ where: { plate: { in: ['TEST0001', 'TESTPEND1'] } } })
   await prisma.user.deleteMany({
     where: { email: { in: ['test-student@dc.com', 'test-instructor@dc.com'] } },
   })
@@ -72,8 +72,8 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  await prisma.lesson.deleteMany({ where: { notes: 'test-lesson' } })
-  await prisma.vehicle.deleteMany({ where: { plate: 'TEST0001' } })
+  await prisma.lesson.deleteMany({ where: { vehicle: { plate: { in: ['TEST0001', 'TESTPEND1'] } } } })
+  await prisma.vehicle.deleteMany({ where: { plate: { in: ['TEST0001', 'TESTPEND1'] } } })
   await prisma.user.deleteMany({
     where: { email: { in: ['test-student@dc.com', 'test-instructor@dc.com'] } },
   })
