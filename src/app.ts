@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import { setupSwagger } from './config/swagger'
 import { errorMiddleware } from './middleware/error.middleware'
 import { authRoutes } from './modules/auth/auth.routes'
 import { studentRoutes } from './modules/students/student.routes'
@@ -11,6 +12,8 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
+
+setupSwagger(app)
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }))
 
