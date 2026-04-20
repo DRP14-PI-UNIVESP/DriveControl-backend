@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: drivecontrol-pg
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: drivecontrol
+      POSTGRES_PASSWORD: drivecontrol
+      POSTGRES_DB: drivecontrol
+    volumes:
+      - drivecontrol_pg_data:/var/lib/postgresql/data
+
+volumes:
+  drivecontrol_pg_data:

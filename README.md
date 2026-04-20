@@ -12,7 +12,21 @@ Backend da plataforma de gestão de aulas de direção entre instrutores e aluno
 ## Requisitos
 
 - Node.js 20+
-- PostgreSQL 16+
+- PostgreSQL 16+ (ou Docker para subir só o banco)
+
+### PostgreSQL com Docker
+
+Se você já usa Docker, pode iniciar um PostgreSQL alinhado ao `.env.example` (porta **5433** no computador host):
+
+```bash
+docker compose up -d
+```
+
+- Parar os containers: `docker compose stop`
+- Remover containers (mantém os dados): `docker compose down`
+- Apagar também o volume com os dados: `docker compose down -v`
+
+Depois copie `.env.example` para `.env` e rode `npm run db:migrate`.
 
 ## Instalação
 
@@ -79,6 +93,10 @@ npm test
 ```
 
 ## Endpoints
+
+Mapeamento completo para o frontend (rotas + payloads + exemplos):
+- `docs/frontend-api-map.md`
+- Swagger UI: `http://localhost:3000/api-docs`
 
 ### Auth
 | Método | Rota | Descrição | Autenticação |
