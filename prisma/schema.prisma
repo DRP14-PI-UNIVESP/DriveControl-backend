@@ -75,16 +75,21 @@ model Student {
 }
 
 model Vehicle {
-  id           String        @id @default(uuid())
-  plate        String        @unique
-  category     String
-  ownerType    OwnerType     @map("owner_type")
-  ownerId      String        @map("owner_id")
-  hasDualControl Boolean     @default(false) @map("has_dual_control")
-  isRegular    Boolean       @default(false) @map("is_regular")
-  status       VehicleStatus @default(PENDING)
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+  id              String        @id @default(uuid())
+  plate           String        @unique
+  renavam         String        @unique
+  brand           String
+  model           String
+  manufactureYear Int           @map("manufacture_year")
+  color           String
+  categories      String[]
+  ownerType       OwnerType     @map("owner_type")
+  ownerId         String        @map("owner_id")
+  hasDualControl  Boolean       @default(false) @map("has_dual_control")
+  isRegular       Boolean       @default(false) @map("is_regular")
+  status          VehicleStatus @default(PENDING)
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
 
   lessons Lesson[]
 

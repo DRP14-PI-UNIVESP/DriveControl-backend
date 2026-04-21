@@ -5,7 +5,12 @@ import { OwnerType } from '@prisma/client'
 
 const createSchema = z.object({
   plate: z.string().min(1),
-  category: z.string().min(1),
+  renavam: z.string().min(1),
+  brand: z.string().min(1),
+  model: z.string().min(1),
+  manufactureYear: z.number().int().min(1900),
+  color: z.string().min(1),
+  categories: z.array(z.string().min(1)).min(1),
   ownerType: z.nativeEnum(OwnerType),
   ownerId: z.string().uuid(),
   hasDualControl: z.boolean(),
