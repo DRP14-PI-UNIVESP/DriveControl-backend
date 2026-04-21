@@ -8,14 +8,14 @@ const createSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   licenseNumber: z.string().min(1),
-  category: z.string().min(1),
+  categories: z.array(z.string().min(1)).min(1),
 })
 
 const updateSchema = z.object({
   name: z.string().min(1).optional(),
   email: z.string().email().optional(),
   licenseNumber: z.string().min(1).optional(),
-  category: z.string().min(1).optional(),
+  categories: z.array(z.string().min(1)).min(1).optional(),
 })
 
 const listSchema = z.object({
@@ -40,6 +40,15 @@ export async function list(req: Request, res: Response, next: NextFunction): Pro
     const params = listSchema.parse(req.query)
     const instructors = await instructorService.listInstructors(params)
     res.json(instructors)
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function getMe(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const instructor = await instructorService.getInstructorByUserId(req.user!.sub)
+    res.json(instructor)
   } catch (err) {
     next(err)
   }

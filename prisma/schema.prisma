@@ -49,7 +49,7 @@ model Instructor {
   id            String   @id @default(uuid())
   userId        String   @unique @map("user_id")
   licenseNumber String   @unique @map("license_number")
-  category      String
+  categories    String[]
   licenseStatus String   @default("ACTIVE") @map("license_status")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")

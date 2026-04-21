@@ -6,7 +6,7 @@ function formatInstructor(instructor: {
   id: string
   userId: string
   licenseNumber: string
-  category: string
+  categories: string[]
   licenseStatus: string
   user: { name: string; email: string }
   _count?: { lessons: number }
@@ -24,7 +24,7 @@ function formatInstructor(instructor: {
     name: instructor.user.name,
     email: instructor.user.email,
     license_number: instructor.licenseNumber,
-    category: instructor.category,
+    categories: instructor.categories,
     license_status: instructor.licenseStatus,
     total_lessons: instructor._count?.lessons ?? instructor.lessons?.length ?? 0,
     rating: avgRating,
@@ -36,7 +36,7 @@ export async function createInstructor(data: {
   email: string
   password: string
   licenseNumber: string
-  category: string
+  categories: string[]
 }) {
   const emailInUse = await prisma.user.findUnique({ where: { email: data.email } })
   if (emailInUse) throw new AppError('Email already in use', 409)
@@ -57,7 +57,7 @@ export async function createInstructor(data: {
       instructor: {
         create: {
           licenseNumber: data.licenseNumber,
-          category: data.category,
+          categories: data.categories,
         },
       },
     },
@@ -68,7 +68,7 @@ export async function createInstructor(data: {
     id: user.instructor!.id,
     userId: user.instructor!.userId,
     licenseNumber: user.instructor!.licenseNumber,
-    category: user.instructor!.category,
+    categories: user.instructor!.categories,
     licenseStatus: user.instructor!.licenseStatus,
     user: { name: user.name, email: user.email },
     _count: { lessons: 0 },
@@ -87,7 +87,7 @@ export async function listInstructors(params: {
 
   const instructors = await prisma.instructor.findMany({
     where: {
-      category: params.category ? { equals: params.category, mode: 'insensitive' } : undefined,
+      categories: params.category ? { has: params.category } : undefined,
       user: params.search
         ? { name: { contains: params.search, mode: 'insensitive' } }
         : undefined,
@@ -136,7 +136,7 @@ export async function getInstructorByUserId(userId: string) {
 
 export async function updateInstructor(
   id: string,
-  data: { name?: string; email?: string; licenseNumber?: string; category?: string }
+  data: { name?: string; email?: string; licenseNumber?: string; categories?: string[] }
 ) {
   const instructor = await prisma.instructor.findUnique({ where: { id } })
   if (!instructor) throw new AppError('Instructor not found', 404)
@@ -145,7 +145,7 @@ export async function updateInstructor(
     where: { id },
     data: {
       licenseNumber: data.licenseNumber,
-      category: data.category,
+      categories: data.categories,
       user: {
         update: {
           name: data.name,
