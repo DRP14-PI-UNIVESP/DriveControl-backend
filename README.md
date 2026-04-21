@@ -6,17 +6,15 @@ Backend da plataforma de gestão de aulas de direção entre instrutores e aluno
 
 - Node.js + TypeScript
 - Express
-- PostgreSQL + Prisma ORM
+- MySQL + Prisma ORM
 - JWT para autenticação
 
 ## Requisitos
 
 - Node.js 20+
-- PostgreSQL 16+ (ou Docker para subir só o banco)
+- Docker (para subir o banco MySQL)
 
-### PostgreSQL com Docker
-
-Se você já usa Docker, pode iniciar um PostgreSQL alinhado ao `.env.example` (porta **5433** no computador host):
+### MySQL com Docker
 
 ```bash
 docker compose up -d
@@ -44,7 +42,7 @@ cp .env.example .env
 
 | Variável | Descrição |
 |---|---|
-| `DATABASE_URL` | URL de conexão com o PostgreSQL |
+| `DATABASE_URL` | URL de conexão com o MySQL |
 | `JWT_SECRET` | Chave secreta para geração dos tokens JWT |
 | `JWT_EXPIRES_IN` | Tempo de expiração do token (ex: `7d`) |
 | `PORT` | Porta do servidor (padrão: `3000`) |
@@ -118,6 +116,7 @@ Mapeamento completo para o frontend (rotas + payloads + exemplos):
 |---|---|---|---|
 | POST | `/instructors` | Cadastro de instrutor | Não |
 | GET | `/instructors` | Listar instrutores | Sim |
+| GET | `/instructors/me` | Perfil do instrutor logado | INSTRUCTOR |
 | GET | `/instructors/:id` | Buscar instrutor por ID | Sim |
 | PUT | `/instructors/:id` | Atualizar perfil | INSTRUCTOR |
 | GET | `/instructors/:id/stats` | Estatísticas do instrutor | Sim |

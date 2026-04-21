@@ -12,22 +12,23 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      postgres:
-        image: postgres:16
+      mysql:
+        image: mysql:8
         env:
-          POSTGRES_USER: drivecontrol
-          POSTGRES_PASSWORD: drivecontrol
-          POSTGRES_DB: drivecontrol_test
+          MYSQL_ROOT_PASSWORD: drivecontrol
+          MYSQL_DATABASE: drivecontrol_test
+          MYSQL_USER: drivecontrol
+          MYSQL_PASSWORD: drivecontrol
         ports:
-          - 5432:5432
+          - 3306:3306
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "mysqladmin ping -h localhost"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
 
     env:
-      DATABASE_URL: postgresql://drivecontrol:drivecontrol@localhost:5432/drivecontrol_test
+      DATABASE_URL: mysql://root:drivecontrol@localhost:3306/drivecontrol_test
       JWT_SECRET: ci-test-secret
       JWT_EXPIRES_IN: 7d
 

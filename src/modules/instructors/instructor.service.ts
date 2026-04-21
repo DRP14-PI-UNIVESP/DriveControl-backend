@@ -6,7 +6,7 @@ function formatInstructor(instructor: {
   id: string
   userId: string
   licenseNumber: string
-  categories: string[]
+  categories: unknown
   licenseStatus: string
   user: { name: string; email: string }
   _count?: { lessons: number }
@@ -24,7 +24,7 @@ function formatInstructor(instructor: {
     name: instructor.user.name,
     email: instructor.user.email,
     license_number: instructor.licenseNumber,
-    categories: instructor.categories,
+    categories: instructor.categories as string[],
     license_status: instructor.licenseStatus,
     total_lessons: instructor._count?.lessons ?? instructor.lessons?.length ?? 0,
     rating: avgRating,
@@ -87,7 +87,7 @@ export async function listInstructors(params: {
 
   const instructors = await prisma.instructor.findMany({
     where: {
-      categories: params.category ? { has: params.category } : undefined,
+      categories: params.category ? { array_contains: params.category } : undefined,
       user: params.search
         ? { name: { contains: params.search, mode: 'insensitive' } }
         : undefined,

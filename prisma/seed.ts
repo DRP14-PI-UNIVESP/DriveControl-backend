@@ -37,7 +37,7 @@ async function main() {
     create: {
       userId: instructorUser.id,
       licenseNumber: 'CNH12345678',
-      category: 'B',
+      categories: ['B'],
       licenseStatus: 'ACTIVE',
     },
   })

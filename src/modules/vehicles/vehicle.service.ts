@@ -10,7 +10,7 @@ function formatVehicle(vehicle: {
   model: string
   manufactureYear: number
   color: string
-  categories: string[]
+  categories: unknown
   ownerType: string
   ownerId: string
   hasDualControl: boolean
@@ -25,7 +25,7 @@ function formatVehicle(vehicle: {
     model: vehicle.model,
     manufacture_year: vehicle.manufactureYear,
     color: vehicle.color,
-    categories: vehicle.categories,
+    categories: vehicle.categories as string[],
     owner_type: vehicle.ownerType,
     owner_id: vehicle.ownerId,
     has_dual_control: vehicle.hasDualControl,
