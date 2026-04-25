@@ -89,7 +89,7 @@ export async function listInstructors(params: {
     where: {
       categories: params.category ? { array_contains: params.category } : undefined,
       user: params.search
-        ? { name: { contains: params.search, mode: 'insensitive' } }
+        ? { name: { contains: params.search } }
         : undefined,
     },
     include: {
