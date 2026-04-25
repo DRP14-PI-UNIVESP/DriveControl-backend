@@ -36,7 +36,12 @@ beforeAll(async () => {
   const vehicle = await prisma.vehicle.create({
     data: {
       plate: 'TESTV001',
-      category: 'B',
+      renavam: '00000000003',
+      brand: 'Test',
+      model: 'Test',
+      manufactureYear: 2020,
+      color: 'Red',
+      categories: ['B'],
       ownerType: 'STUDENT',
       ownerId: studentUser.student!.id,
       hasDualControl: false,

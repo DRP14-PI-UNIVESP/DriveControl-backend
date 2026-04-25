@@ -26,7 +26,7 @@ beforeAll(async () => {
       password: await bcrypt.hash('pass123', 10),
       role: 'INSTRUCTOR',
       instructor: {
-        create: { licenseNumber: 'TEST-CNH-001', category: 'B', licenseStatus: 'ACTIVE' },
+        create: { licenseNumber: 'TEST-CNH-001', categories: ['B'], licenseStatus: 'ACTIVE' },
       },
     },
     include: { instructor: true },
@@ -50,7 +50,12 @@ beforeAll(async () => {
   const vehicle = await prisma.vehicle.create({
     data: {
       plate: 'TEST0001',
-      category: 'B',
+      renavam: '00000000001',
+      brand: 'Test',
+      model: 'Test',
+      manufactureYear: 2020,
+      color: 'Red',
+      categories: ['B'],
       ownerType: 'INSTRUCTOR',
       ownerId: instructorId,
       hasDualControl: true,
@@ -120,7 +125,12 @@ describe('POST /lessons', () => {
     const unapprovedVehicle = await prisma.vehicle.create({
       data: {
         plate: 'TESTPEND1',
-        category: 'B',
+        renavam: '00000000002',
+        brand: 'Test',
+        model: 'Test',
+        manufactureYear: 2020,
+        color: 'Red',
+        categories: ['B'],
         ownerType: 'INSTRUCTOR',
         ownerId: instructorId,
         hasDualControl: false,
