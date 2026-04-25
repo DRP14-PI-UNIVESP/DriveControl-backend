@@ -57,10 +57,12 @@ export async function createLesson(data: {
   const student = await prisma.student.findUnique({ where: { id: data.studentId } })
   if (!student) throw new AppError('Student not found', 404)
 
-  // Validate vehicle is approved
+  // Validate vehicle exists and is usable
   const vehicle = await prisma.vehicle.findUnique({ where: { id: data.vehicleId } })
   if (!vehicle) throw new AppError('Vehicle not found', 404)
-  if (vehicle.status !== 'APPROVED') throw new AppError('Vehicle is not approved for use', 400)
+  if (vehicle.ownerType !== 'STUDENT' && vehicle.status !== 'APPROVED') {
+    throw new AppError('Vehicle is not approved for use', 400)
+  }
 
   // Check for scheduling conflict (overlap detection)
   const lessonsOnDate = await prisma.lesson.findMany({
