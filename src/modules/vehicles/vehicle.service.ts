@@ -64,6 +64,7 @@ export async function createVehicle(data: {
       ownerType: data.ownerType,
       ownerId: data.ownerId,
       hasDualControl: data.hasDualControl,
+      status: data.ownerType === 'STUDENT' ? 'APPROVED' : 'PENDING',
     },
   })
 

@@ -9,8 +9,13 @@ const createSchema = z.object({
   vehicleId: z.string().uuid(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD'),
   startTime: z.string().regex(/^\d{2}:\d{2}$/, 'Start time must be HH:MM'),
-  durationMinutes: z.number().int().min(30),
+  durationMinutes: z.number().int().min(30).max(120),
   notes: z.string().optional(),
+})
+
+const bookedTimesSchema = z.object({
+  instructorId: z.string().uuid(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 })
 
 const completeSchema = z.object({
@@ -95,6 +100,19 @@ export async function createByInstructor(req: Request, res: Response, next: Next
       notes: data.notes,
     })
     res.status(201).json(lesson)
+  } catch (err) {
+    next(err)
+  }
+}
+
+export async function getBookedTimes(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { instructorId, date } = bookedTimesSchema.parse(req.query)
+    const lessons = await prisma.lesson.findMany({
+      where: { instructorId, date, status: { in: ['SCHEDULED', 'IN_PROGRESS'] } },
+      select: { startTime: true, durationMinutes: true },
+    })
+    res.json(lessons.map((l) => ({ start_time: l.startTime, duration_minutes: l.durationMinutes })))
   } catch (err) {
     next(err)
   }

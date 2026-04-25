@@ -62,17 +62,32 @@ export async function createLesson(data: {
   if (!vehicle) throw new AppError('Vehicle not found', 404)
   if (vehicle.status !== 'APPROVED') throw new AppError('Vehicle is not approved for use', 400)
 
-  // Check for scheduling conflict (same instructor, same date, overlapping time)
-  const conflictingLesson = await prisma.lesson.findFirst({
+  // Check for scheduling conflict (overlap detection)
+  const lessonsOnDate = await prisma.lesson.findMany({
     where: {
       instructorId: data.instructorId,
       date: data.date,
-      startTime: data.startTime,
       status: { in: ['SCHEDULED', 'IN_PROGRESS'] },
     },
+    select: { startTime: true, durationMinutes: true },
   })
-  if (conflictingLesson) {
-    throw new AppError('Instructor already has a lesson scheduled at this time', 409)
+
+  const toMinutes = (t: string) => {
+    const [h, m] = t.split(':').map(Number)
+    return h * 60 + m
+  }
+
+  const newStart = toMinutes(data.startTime)
+  const newEnd = newStart + data.durationMinutes
+
+  const hasConflict = lessonsOnDate.some((l) => {
+    const existingStart = toMinutes(l.startTime)
+    const existingEnd = existingStart + l.durationMinutes
+    return newStart < existingEnd && existingStart < newEnd
+  })
+
+  if (hasConflict) {
+    throw new AppError('Instrutor já possui aula neste horário', 409)
   }
 
   const lesson = await prisma.lesson.create({
