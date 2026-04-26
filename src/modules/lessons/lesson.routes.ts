@@ -9,4 +9,5 @@ lessonRoutes.post('/instructor', authMiddleware, requireRole('INSTRUCTOR'), less
 lessonRoutes.get('/booked-times', authMiddleware, lessonController.getBookedTimes)
 lessonRoutes.get('/', authMiddleware, lessonController.list)
 lessonRoutes.patch('/:id/complete', authMiddleware, requireRole('INSTRUCTOR'), lessonController.complete)
+lessonRoutes.patch('/:id/reschedule', authMiddleware, requireRole('STUDENT'), lessonController.reschedule)
 lessonRoutes.patch('/:id/cancel', authMiddleware, lessonController.cancel)

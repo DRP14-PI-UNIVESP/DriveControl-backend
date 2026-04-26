@@ -118,9 +118,26 @@ export async function getBookedTimes(req: Request, res: Response, next: NextFunc
   }
 }
 
+const rescheduleSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  startTime: z.string().regex(/^\d{2}:\d{2}$/),
+  durationMinutes: z.number().int().min(30).max(120),
+})
+
+export async function reschedule(req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const data = rescheduleSchema.parse(req.body)
+    const lesson = await lessonService.rescheduleLesson(req.params.id, data)
+    res.json(lesson)
+  } catch (err) {
+    next(err)
+  }
+}
+
 export async function cancel(req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> {
   try {
-    const lesson = await lessonService.cancelLesson(req.params.id)
+    const { reason } = z.object({ reason: z.string().optional() }).parse(req.body)
+    const lesson = await lessonService.cancelLesson(req.params.id, reason)
     res.json(lesson)
   } catch (err) {
     next(err)

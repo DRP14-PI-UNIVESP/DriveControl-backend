@@ -148,7 +148,50 @@ export async function completeLesson(
   return formatLesson(updated)
 }
 
-export async function cancelLesson(id: string) {
+export async function rescheduleLesson(
+  id: string,
+  data: { date: string; startTime: string; durationMinutes: number }
+) {
+  const lesson = await prisma.lesson.findUnique({ where: { id } })
+  if (!lesson) throw new AppError('Lesson not found', 404)
+  if (lesson.status !== 'SCHEDULED') throw new AppError('Only scheduled lessons can be rescheduled', 400)
+
+  const lessonsOnDate = await prisma.lesson.findMany({
+    where: {
+      instructorId: lesson.instructorId,
+      date: data.date,
+      status: { in: ['SCHEDULED', 'IN_PROGRESS'] },
+      id: { not: id },
+    },
+    select: { startTime: true, durationMinutes: true },
+  })
+
+  const toMinutes = (t: string) => {
+    const [h, m] = t.split(':').map(Number)
+    return h * 60 + m
+  }
+
+  const newStart = toMinutes(data.startTime)
+  const newEnd = newStart + data.durationMinutes
+
+  const hasConflict = lessonsOnDate.some((l) => {
+    const existingStart = toMinutes(l.startTime)
+    const existingEnd = existingStart + l.durationMinutes
+    return newStart < existingEnd && existingStart < newEnd
+  })
+
+  if (hasConflict) throw new AppError('Instrutor já possui aula neste horário', 409)
+
+  const updated = await prisma.lesson.update({
+    where: { id },
+    data: { date: data.date, startTime: data.startTime, durationMinutes: data.durationMinutes },
+    include: lessonInclude,
+  })
+
+  return formatLesson(updated)
+}
+
+export async function cancelLesson(id: string, reason?: string) {
   const lesson = await prisma.lesson.findUnique({ where: { id } })
   if (!lesson) throw new AppError('Lesson not found', 404)
   if (lesson.status === 'COMPLETED') throw new AppError('Cannot cancel a completed lesson', 400)
@@ -156,7 +199,7 @@ export async function cancelLesson(id: string) {
 
   const updated = await prisma.lesson.update({
     where: { id },
-    data: { status: 'CANCELLED' },
+    data: { status: 'CANCELLED', notes: reason ?? lesson.notes },
     include: lessonInclude,
   })
 
