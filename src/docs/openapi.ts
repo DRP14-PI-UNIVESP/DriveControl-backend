@@ -59,7 +59,7 @@ export function getOpenApiDocument() {
         },
         Role: {
           type: 'string',
-          enum: ['ADMIN', 'INSTRUCTOR', 'STUDENT'],
+          enum: ['INSTRUCTOR', 'STUDENT'],
         },
         SignInRequest: {
           type: 'object',

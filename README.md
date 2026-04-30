@@ -65,7 +65,6 @@ Usuários criados pelo seed:
 
 | Papel | Email | Senha |
 |---|---|---|
-| Admin | admin@drivecontrol.com | admin123 |
 | Instrutor | instrutor@drivecontrol.com | instructor123 |
 | Aluno | aluno@drivecontrol.com | student123 |
 
@@ -124,18 +123,27 @@ Mapeamento completo para o frontend (rotas + payloads + exemplos):
 ### Veículos
 | Método | Rota | Descrição | Autenticação |
 |---|---|---|---|
-| POST | `/vehicles` | Cadastrar veículo | Sim |
+| POST | `/vehicles` | Cadastrar veículo (aprovado automaticamente) | Sim |
 | GET | `/vehicles` | Listar veículos por proprietário | Sim |
 | GET | `/vehicles/:id` | Buscar veículo por ID | Sim |
-| PATCH | `/vehicles/:id/status` | Aprovar ou rejeitar veículo | ADMIN |
 
 ### Aulas
 | Método | Rota | Descrição | Autenticação |
 |---|---|---|---|
 | POST | `/lessons` | Agendar aula | STUDENT |
-| GET | `/lessons` | Listar aulas | Sim |
+| POST | `/lessons/instructor` | Agendar aula (pelo instrutor) | INSTRUCTOR |
+| GET | `/lessons` | Listar aulas (query: `instructorId` ou `studentId`) | Sim |
+| GET | `/lessons/booked-times` | Horários ocupados de um instrutor em uma data | Sim |
 | PATCH | `/lessons/:id/complete` | Concluir aula com avaliação | INSTRUCTOR |
-| PATCH | `/lessons/:id/cancel` | Cancelar aula | Sim |
+| PATCH | `/lessons/:id/cancel` | Cancelar aula com motivo opcional | Sim |
+| PATCH | `/lessons/:id/reschedule` | Reagendar aula | STUDENT |
+
+### Disponibilidades
+| Método | Rota | Descrição | Autenticação |
+|---|---|---|---|
+| POST | `/availabilities` | Cadastrar disponibilidade | INSTRUCTOR |
+| GET | `/availabilities` | Listar disponibilidades | Sim |
+| DELETE | `/availabilities/:id` | Remover disponibilidade | INSTRUCTOR |
 
 ### Health Check
 | Método | Rota | Descrição |
