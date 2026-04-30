@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs'
 
 let instructorToken: string
 let studentToken: string
+let instructorId: string
 
 beforeAll(async () => {
   await prisma.vehicle.deleteMany({ where: { plate: { in: ['TESTV001', 'TESTV002'] } } })
@@ -28,6 +29,7 @@ beforeAll(async () => {
     },
     include: { instructor: true },
   })
+  instructorId = instructorUser.instructor!.id
 
   const studentUser = await prisma.user.create({
     data: {
@@ -73,6 +75,7 @@ describe('POST /vehicles', () => {
         color: 'White',
         categories: ['B'],
         ownerType: 'INSTRUCTOR',
+        ownerId: instructorId,
         hasDualControl: false,
       })
 
@@ -93,6 +96,7 @@ describe('POST /vehicles', () => {
         color: 'Black',
         categories: ['B'],
         ownerType: 'INSTRUCTOR',
+        ownerId: instructorId,
         hasDualControl: false,
       })
 
