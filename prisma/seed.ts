@@ -5,19 +5,6 @@ import bcrypt from 'bcryptjs'
 const prisma = new PrismaClient()
 
 async function main() {
-  const adminPassword = await bcrypt.hash('admin123', 10)
-
-  await prisma.user.upsert({
-    where: { email: 'admin@drivecontrol.com' },
-    update: {},
-    create: {
-      name: 'Administrador',
-      email: 'admin@drivecontrol.com',
-      password: adminPassword,
-      role: 'ADMIN',
-    },
-  })
-
   const instructorPassword = await bcrypt.hash('instructor123', 10)
 
   const instructorUser = await prisma.user.upsert({
@@ -37,7 +24,7 @@ async function main() {
     create: {
       userId: instructorUser.id,
       licenseNumber: 'CNH12345678',
-      category: 'B',
+      categories: ['B'],
       licenseStatus: 'ACTIVE',
     },
   })
@@ -66,7 +53,6 @@ async function main() {
   })
 
   console.log('Seed completed.')
-  console.log('Admin:      admin@drivecontrol.com / admin123')
   console.log('Instructor: instrutor@drivecontrol.com / instructor123')
   console.log('Student:    aluno@drivecontrol.com / student123')
 }

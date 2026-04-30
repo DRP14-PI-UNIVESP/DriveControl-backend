@@ -3,12 +3,11 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 enum Role {
-  ADMIN
   INSTRUCTOR
   STUDENT
 }
@@ -49,13 +48,14 @@ model Instructor {
   id            String   @id @default(uuid())
   userId        String   @unique @map("user_id")
   licenseNumber String   @unique @map("license_number")
-  category      String
+  categories    Json
   licenseStatus String   @default("ACTIVE") @map("license_status")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lessons  Lesson[]
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessons        Lesson[]
+  availabilities Availability[]
 
   @@map("instructors")
 }
@@ -75,16 +75,21 @@ model Student {
 }
 
 model Vehicle {
-  id           String        @id @default(uuid())
-  plate        String        @unique
-  category     String
-  ownerType    OwnerType     @map("owner_type")
-  ownerId      String        @map("owner_id")
-  hasDualControl Boolean     @default(false) @map("has_dual_control")
-  isRegular    Boolean       @default(false) @map("is_regular")
-  status       VehicleStatus @default(PENDING)
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
+  id              String        @id @default(uuid())
+  plate           String        @unique
+  renavam         String        @unique
+  brand           String
+  model           String
+  manufactureYear Int           @map("manufacture_year")
+  color           String
+  categories      Json
+  ownerType       OwnerType     @map("owner_type")
+  ownerId         String        @map("owner_id")
+  hasDualControl  Boolean       @default(false) @map("has_dual_control")
+  isRegular       Boolean       @default(false) @map("is_regular")
+  status          VehicleStatus @default(PENDING)
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
 
   lessons Lesson[]
 
@@ -112,4 +117,21 @@ model Lesson {
   vehicle    Vehicle    @relation(fields: [vehicleId], references: [id])
 
   @@map("lessons")
+}
+
+model Availability {
+  id              String   @id @default(uuid())
+  instructorId    String   @map("instructor_id")
+  date            String
+  startTime       String   @map("start_time")
+  durationMinutes Int      @map("duration_minutes")
+  isBooked        Boolean  @default(false) @map("is_booked")
+  notes           String?
+
+  instructor Instructor @relation(fields: [instructorId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("availabilities")
 }

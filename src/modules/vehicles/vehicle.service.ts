@@ -5,7 +5,12 @@ import { AppError } from '../../middleware/error.middleware'
 function formatVehicle(vehicle: {
   id: string
   plate: string
-  category: string
+  renavam: string
+  brand: string
+  model: string
+  manufactureYear: number
+  color: string
+  categories: unknown
   ownerType: string
   ownerId: string
   hasDualControl: boolean
@@ -15,7 +20,12 @@ function formatVehicle(vehicle: {
   return {
     id: vehicle.id,
     plate: vehicle.plate,
-    category: vehicle.category,
+    renavam: vehicle.renavam,
+    brand: vehicle.brand,
+    model: vehicle.model,
+    manufacture_year: vehicle.manufactureYear,
+    color: vehicle.color,
+    categories: vehicle.categories as string[],
     owner_type: vehicle.ownerType,
     owner_id: vehicle.ownerId,
     has_dual_control: vehicle.hasDualControl,
@@ -26,7 +36,12 @@ function formatVehicle(vehicle: {
 
 export async function createVehicle(data: {
   plate: string
-  category: string
+  renavam: string
+  brand: string
+  model: string
+  manufactureYear: number
+  color: string
+  categories: string[]
   ownerType: OwnerType
   ownerId: string
   hasDualControl: boolean
@@ -34,13 +49,22 @@ export async function createVehicle(data: {
   const plateInUse = await prisma.vehicle.findUnique({ where: { plate: data.plate } })
   if (plateInUse) throw new AppError('Plate already registered', 409)
 
+  const renavamInUse = await prisma.vehicle.findUnique({ where: { renavam: data.renavam } })
+  if (renavamInUse) throw new AppError('RENAVAM already registered', 409)
+
   const vehicle = await prisma.vehicle.create({
     data: {
       plate: data.plate,
-      category: data.category,
+      renavam: data.renavam,
+      brand: data.brand,
+      model: data.model,
+      manufactureYear: data.manufactureYear,
+      color: data.color,
+      categories: data.categories,
       ownerType: data.ownerType,
       ownerId: data.ownerId,
       hasDualControl: data.hasDualControl,
+      status: 'APPROVED',
     },
   })
 

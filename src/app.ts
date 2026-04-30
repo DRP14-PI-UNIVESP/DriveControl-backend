@@ -7,6 +7,7 @@ import { studentRoutes } from './modules/students/student.routes'
 import { instructorRoutes } from './modules/instructors/instructor.routes'
 import { vehicleRoutes } from './modules/vehicles/vehicle.routes'
 import { lessonRoutes } from './modules/lessons/lesson.routes'
+import { availabilityRoutes } from './modules/availabilities/availability.routes'
 
 const app = express()
 
@@ -22,6 +23,7 @@ app.use('/students', studentRoutes)
 app.use('/instructors', instructorRoutes)
 app.use('/vehicles', vehicleRoutes)
 app.use('/lessons', lessonRoutes)
+app.use('/availabilities', availabilityRoutes)
 
 app.use(errorMiddleware)
 
