@@ -9,6 +9,8 @@ const createSchema = z.object({
   password: z.string().min(6),
   licenseNumber: z.string().min(1),
   categories: z.array(z.string().min(1)).min(1),
+  phone: z.string().optional(),
+  location: z.string().optional(),
 })
 
 const updateSchema = z.object({
@@ -16,6 +18,8 @@ const updateSchema = z.object({
   email: z.string().email().optional(),
   licenseNumber: z.string().min(1).optional(),
   categories: z.array(z.string().min(1)).min(1).optional(),
+  phone: z.string().optional(),
+  location: z.string().optional(),
 })
 
 const listSchema = z.object({

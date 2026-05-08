@@ -50,6 +50,8 @@ model Instructor {
   licenseNumber String   @unique @map("license_number")
   categories    Json
   licenseStatus String   @default("ACTIVE") @map("license_status")
+  phone         String?
+  location      String?
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
 
@@ -106,6 +108,8 @@ model Lesson {
   endTime         String?      @map("end_time")
   durationMinutes Int          @map("duration_minutes")
   rating          Float?
+  studentRating   Float?   @map("student_rating")
+  studentRatingNote String? @map("student_rating_note")
   notes           String?
   difficulties    String?
   status          LessonStatus @default(SCHEDULED)

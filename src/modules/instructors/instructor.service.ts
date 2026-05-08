@@ -8,14 +8,16 @@ function formatInstructor(instructor: {
   licenseNumber: string
   categories: unknown
   licenseStatus: string
+  phone?: string | null
+  location?: string | null
   user: { name: string; email: string }
   _count?: { lessons: number }
-  lessons?: { rating: number | null }[]
+  lessons?: { studentRating: number | null }[]
 }) {
-  const completedLessons = instructor.lessons?.filter((l) => l.rating !== null) ?? []
+  const ratedLessons = instructor.lessons?.filter((l) => l.studentRating !== null) ?? []
   const avgRating =
-    completedLessons.length > 0
-      ? completedLessons.reduce((sum, l) => sum + (l.rating ?? 0), 0) / completedLessons.length
+    ratedLessons.length > 0
+      ? ratedLessons.reduce((sum, l) => sum + (l.studentRating ?? 0), 0) / ratedLessons.length
       : undefined
 
   return {
@@ -26,6 +28,8 @@ function formatInstructor(instructor: {
     license_number: instructor.licenseNumber,
     categories: instructor.categories as string[],
     license_status: instructor.licenseStatus,
+    phone: instructor.phone ?? undefined,
+    location: instructor.location ?? undefined,
     total_lessons: instructor._count?.lessons ?? instructor.lessons?.length ?? 0,
     rating: avgRating,
   }
@@ -37,6 +41,8 @@ export async function createInstructor(data: {
   password: string
   licenseNumber: string
   categories: string[]
+  phone?: string
+  location?: string
 }) {
   const emailInUse = await prisma.user.findUnique({ where: { email: data.email } })
   if (emailInUse) throw new AppError('Email already in use', 409)
@@ -58,6 +64,8 @@ export async function createInstructor(data: {
         create: {
           licenseNumber: data.licenseNumber,
           categories: data.categories,
+          phone: data.phone,
+          location: data.location,
         },
       },
     },
@@ -94,8 +102,8 @@ export async function listInstructors(params: {
     },
     include: {
       user: true,
-      _count: { select: { lessons: true } },
-      lessons: { select: { rating: true }, where: { status: 'COMPLETED' } },
+      _count: { select: { lessons: { where: { status: { not: 'CANCELLED' } } } } },
+      lessons: { select: { studentRating: true }, where: { status: 'COMPLETED' } },
     },
     skip,
     take: limit,
@@ -109,8 +117,8 @@ export async function getInstructorById(id: string) {
     where: { id },
     include: {
       user: true,
-      _count: { select: { lessons: true } },
-      lessons: { select: { rating: true }, where: { status: 'COMPLETED' } },
+      _count: { select: { lessons: { where: { status: { not: 'CANCELLED' } } } } },
+      lessons: { select: { studentRating: true }, where: { status: 'COMPLETED' } },
     },
   })
 
@@ -124,8 +132,8 @@ export async function getInstructorByUserId(userId: string) {
     where: { userId },
     include: {
       user: true,
-      _count: { select: { lessons: true } },
-      lessons: { select: { rating: true }, where: { status: 'COMPLETED' } },
+      _count: { select: { lessons: { where: { status: { not: 'CANCELLED' } } } } },
+      lessons: { select: { studentRating: true }, where: { status: 'COMPLETED' } },
     },
   })
 
@@ -136,7 +144,7 @@ export async function getInstructorByUserId(userId: string) {
 
 export async function updateInstructor(
   id: string,
-  data: { name?: string; email?: string; licenseNumber?: string; categories?: string[] }
+  data: { name?: string; email?: string; licenseNumber?: string; categories?: string[]; phone?: string; location?: string }
 ) {
   const instructor = await prisma.instructor.findUnique({ where: { id } })
   if (!instructor) throw new AppError('Instructor not found', 404)
@@ -146,6 +154,8 @@ export async function updateInstructor(
     data: {
       licenseNumber: data.licenseNumber,
       categories: data.categories,
+      phone: data.phone,
+      location: data.location,
       user: {
         update: {
           name: data.name,
@@ -155,8 +165,8 @@ export async function updateInstructor(
     },
     include: {
       user: true,
-      _count: { select: { lessons: true } },
-      lessons: { select: { rating: true }, where: { status: 'COMPLETED' } },
+      _count: { select: { lessons: { where: { status: { not: 'CANCELLED' } } } } },
+      lessons: { select: { studentRating: true }, where: { status: 'COMPLETED' } },
     },
   })
 
