@@ -143,3 +143,16 @@ export async function cancel(req: Request<{ id: string }>, res: Response, next: 
     next(err)
   }
 }
+
+export async function rate(req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { studentRating, studentRatingNote } = z.object({
+      studentRating: z.number().min(1).max(5),
+      studentRatingNote: z.string().optional(),
+    }).parse(req.body)
+    const lesson = await lessonService.rateLesson(req.params.id, studentRating, studentRatingNote)
+    res.json(lesson)
+  } catch (err) {
+    next(err)
+  }
+}

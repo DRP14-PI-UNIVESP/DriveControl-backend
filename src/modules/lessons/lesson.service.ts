@@ -11,6 +11,8 @@ function formatLesson(lesson: {
   endTime: string | null
   durationMinutes: number
   rating: number | null
+  studentRating: number | null
+  studentRatingNote: string | null
   notes: string | null
   difficulties: string | null
   status: string
@@ -29,6 +31,8 @@ function formatLesson(lesson: {
     end_time: lesson.endTime,
     duration_minutes: lesson.durationMinutes,
     rating: lesson.rating ?? undefined,
+    student_rating: lesson.studentRating ?? undefined,
+    student_rating_note: lesson.studentRatingNote ?? undefined,
     notes: lesson.notes ?? undefined,
     difficulties: lesson.difficulties ?? undefined,
     status: lesson.status,
@@ -185,6 +189,21 @@ export async function rescheduleLesson(
   const updated = await prisma.lesson.update({
     where: { id },
     data: { date: data.date, startTime: data.startTime, durationMinutes: data.durationMinutes },
+    include: lessonInclude,
+  })
+
+  return formatLesson(updated)
+}
+
+export async function rateLesson(id: string, studentRating: number, studentRatingNote?: string) {
+  const lesson = await prisma.lesson.findUnique({ where: { id } })
+  if (!lesson) throw new AppError('Lesson not found', 404)
+  if (lesson.status !== 'COMPLETED') throw new AppError('Only completed lessons can be rated', 400)
+  if (lesson.studentRating !== null) throw new AppError('Lesson already rated', 400)
+
+  const updated = await prisma.lesson.update({
+    where: { id },
+    data: { studentRating, studentRatingNote: studentRatingNote ?? null },
     include: lessonInclude,
   })
 
