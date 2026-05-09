@@ -120,6 +120,9 @@ Mapeamento completo para o frontend (rotas + payloads + exemplos):
 | PUT | `/instructors/:id` | Atualizar perfil | INSTRUCTOR |
 | GET | `/instructors/:id/stats` | Estatísticas do instrutor | Sim |
 
+`GET /instructors` também aceita os filtros opcionais `region` (CEP ou endereço) e `radiusKm` (ex: 5, 10) para retornar instrutores cuja localização de aula está dentro do raio informado.  
+A geocodificação é feita com OpenStreetMap/Nominatim (sem necessidade de chave de API).
+
 ### Veículos
 | Método | Rota | Descrição | Autenticação |
 |---|---|---|---|

@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import { prisma } from '../../config/database'
 import { AppError } from '../../middleware/error.middleware'
+import { calculateDistanceKm, geocodeRegion } from '../../services/geolocation.service'
 
 function formatInstructor(instructor: {
   id: string
@@ -13,6 +14,7 @@ function formatInstructor(instructor: {
   user: { name: string; email: string }
   _count?: { lessons: number }
   lessons?: { studentRating: number | null }[]
+  distanceKm?: number
 }) {
   const ratedLessons = instructor.lessons?.filter((l) => l.studentRating !== null) ?? []
   const avgRating =
@@ -32,6 +34,7 @@ function formatInstructor(instructor: {
     location: instructor.location ?? undefined,
     total_lessons: instructor._count?.lessons ?? instructor.lessons?.length ?? 0,
     rating: avgRating,
+    distance_km: instructor.distanceKm,
   }
 }
 
@@ -86,6 +89,8 @@ export async function createInstructor(data: {
 export async function listInstructors(params: {
   search?: string
   category?: string
+  region?: string
+  radiusKm?: number
   page?: number
   limit?: number
 }) {
@@ -96,9 +101,8 @@ export async function listInstructors(params: {
   const instructors = await prisma.instructor.findMany({
     where: {
       categories: params.category ? { array_contains: params.category } : undefined,
-      user: params.search
-        ? { name: { contains: params.search } }
-        : undefined,
+      user: params.search ? { name: { contains: params.search } } : undefined,
+      location: params.region ? { not: null } : undefined,
     },
     include: {
       user: true,
@@ -109,7 +113,34 @@ export async function listInstructors(params: {
     take: limit,
   })
 
-  return instructors.map(formatInstructor)
+  if (!params.region) {
+    return instructors.map(formatInstructor)
+  }
+
+  const studentLocation = await geocodeRegion(params.region)
+  const radiusKm = params.radiusKm ?? 10
+
+  const instructorsInRange = await Promise.all(
+    instructors.map(async (instructor) => {
+      if (!instructor.location) return null
+
+      try {
+        const instructorLocation = await geocodeRegion(instructor.location)
+        const distanceKm = calculateDistanceKm(studentLocation, instructorLocation)
+
+        if (distanceKm > radiusKm) return null
+
+        return formatInstructor({
+          ...instructor,
+          distanceKm: Number(distanceKm.toFixed(2)),
+        })
+      } catch {
+        return null
+      }
+    })
+  )
+
+  return instructorsInRange.filter((instructor) => instructor !== null)
 }
 
 export async function getInstructorById(id: string) {

@@ -25,6 +25,8 @@ const updateSchema = z.object({
 const listSchema = z.object({
   search: z.string().optional(),
   category: z.string().optional(),
+  region: z.string().min(1).optional(),
+  radiusKm: z.coerce.number().positive().max(100).optional(),
   page: z.coerce.number().int().min(1).optional(),
   limit: z.coerce.number().int().min(1).max(100).optional(),
 })
