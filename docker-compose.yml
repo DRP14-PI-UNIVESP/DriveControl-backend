@@ -1,17 +1,16 @@
 services:
-  mysql:
-    image: mysql:8
-    container_name: drivecontrol-mysql
+  postgres:
+    image: postgres:16
+    container_name: drivecontrol-postgres
     restart: unless-stopped
     ports:
-      - "3307:3306"
+      - "5432:5432"
     environment:
-      MYSQL_ROOT_PASSWORD: drivecontrol
-      MYSQL_DATABASE: drivecontrol
-      MYSQL_USER: drivecontrol
-      MYSQL_PASSWORD: drivecontrol
+      POSTGRES_DB: drivecontrol
+      POSTGRES_USER: drivecontrol
+      POSTGRES_PASSWORD: drivecontrol
     volumes:
-      - drivecontrol_mysql_data:/var/lib/mysql
+      - drivecontrol_postgres_data:/var/lib/postgresql/data
 
 volumes:
-  drivecontrol_mysql_data:
+  drivecontrol_postgres_data:
