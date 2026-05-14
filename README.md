@@ -6,15 +6,15 @@ Backend da plataforma de gestão de aulas de direção entre instrutores e aluno
 
 - Node.js + TypeScript
 - Express
-- MySQL + Prisma ORM
+- PostgreSQL + Prisma ORM
 - JWT para autenticação
 
 ## Requisitos
 
 - Node.js 20+
-- Docker (para subir o banco MySQL)
+- Docker (para subir o banco PostgreSQL)
 
-### MySQL com Docker
+### PostgreSQL com Docker
 
 ```bash
 docker compose up -d
@@ -42,7 +42,7 @@ cp .env.example .env
 
 | Variável | Descrição |
 |---|---|
-| `DATABASE_URL` | URL de conexão com o MySQL |
+| `DATABASE_URL` | URL de conexão com o PostgreSQL |
 | `JWT_SECRET` | Chave secreta para geração dos tokens JWT |
 | `JWT_EXPIRES_IN` | Tempo de expiração do token (ex: `7d`) |
 | `PORT` | Porta do servidor (padrão: `3000`) |
@@ -61,12 +61,6 @@ Popular com dados iniciais:
 npm run db:seed
 ```
 
-Usuários criados pelo seed:
-
-| Papel | Email | Senha |
-|---|---|---|
-| Instrutor | instrutor@drivecontrol.com | instructor123 |
-| Aluno | aluno@drivecontrol.com | student123 |
 
 ## Rodando em desenvolvimento
 
@@ -88,6 +82,39 @@ npm start
 ```bash
 npm test
 ```
+
+## Deploy
+
+A aplicação está em produção:
+
+- **API (backend):** [https://drivecontrol-api.onrender.com](https://drivecontrol-api.onrender.com)
+- **Frontend:** [https://drive-control-two.vercel.app](https://drive-control-two.vercel.app)
+- **Swagger UI em produção:** [https://drivecontrol-api.onrender.com/api-docs](https://drivecontrol-api.onrender.com/api-docs)
+
+### Backend — Render (Blueprint)
+
+O deploy é gerenciado por um Blueprint definido em [`render.yaml`](./render.yaml). Em cada push para `main`, o Render automaticamente:
+
+1. Instala dependências com `npm ci --include=dev`
+2. Gera o Prisma Client (`prisma generate`)
+3. Aplica migrations pendentes (`prisma migrate deploy`)
+4. Compila o TypeScript (`tsc`)
+5. Inicia o servidor (`npm start`)
+6. Verifica saúde via `GET /health`
+
+Banco de dados: **PostgreSQL gerenciado pelo Render** (plano free, conexão injetada via variável de ambiente `DATABASE_URL` do próprio Blueprint).
+
+> ⚠️ **Plano free do Render:** o serviço hiberna após 15 minutos sem requisições. A primeira chamada após hibernação pode levar ~30-50s para responder. O banco free expira em 30 dias e precisa ser recriado.
+
+### Popular o banco em produção
+
+Após o primeiro deploy, o banco está com schema mas vazio. Para popular com os dados demo:
+
+```bash
+DATABASE_URL="<external-database-url-do-render>" npm run db:seed
+```
+
+A `External Database URL` é encontrada no dashboard do Render → `drivecontrol-db` → seção **Connections**.
 
 ## Endpoints
 
