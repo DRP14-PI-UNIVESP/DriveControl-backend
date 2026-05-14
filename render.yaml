@@ -5,7 +5,7 @@ services:
     region: oregon
     plan: free
     rootDir: .
-    buildCommand: npm ci && npm run db:generate && npx prisma migrate deploy && npm run build
+    buildCommand: npm ci --include=dev && npm run db:generate && npx prisma migrate deploy && npm run build
     startCommand: npm start
     healthCheckPath: /health
     envVars:
